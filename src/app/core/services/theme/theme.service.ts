@@ -1,17 +1,18 @@
-import { Injectable, signal, effect, inject, RendererFactory2 } from '@angular/core';
+import { Injectable, signal, effect, RendererFactory2, Renderer2 } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
-  private readonly renderer = inject(RendererFactory2).createRenderer(null, null);
-
+  private readonly renderer: Renderer2;
   private readonly THEME_KEY = 'shelfy-is-dark-theme';
 
   private readonly _isDark = signal<boolean>(this.getInitialTheme());
   public readonly isDark = this._isDark.asReadonly();
 
-  constructor() {
+  constructor(rendererFactory: RendererFactory2) {
+    this.renderer = rendererFactory.createRenderer(null, null);
+
     effect(() => {
       const isDark = this._isDark();
 

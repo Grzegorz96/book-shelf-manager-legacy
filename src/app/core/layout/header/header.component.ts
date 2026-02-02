@@ -1,4 +1,4 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, Signal } from '@angular/core';
 import { RouterLinkActive, RouterLink, Router } from '@angular/router';
 import { LucideAngularModule } from 'lucide-angular';
 import { LogoComponent } from '@shared/logo';
@@ -11,12 +11,18 @@ import { AuthService, ThemeService } from '@core/services';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent {
-  private readonly authService = inject(AuthService);
-  private readonly themeService = inject(ThemeService);
-  protected readonly isAuthenticated = this.authService.isAuthenticated;
-  protected readonly isDark = this.themeService.isDark;
-  private readonly router = inject(Router);
+  protected readonly isAuthenticated: Signal<boolean>;
+  protected readonly isDark: Signal<boolean>;
   protected readonly isMenuOpen = signal(false);
+
+  constructor(
+    private readonly authService: AuthService,
+    private readonly themeService: ThemeService,
+    private readonly router: Router
+  ) {
+    this.isAuthenticated = this.authService.isAuthenticated;
+    this.isDark = this.themeService.isDark;
+  }
 
   protected toggleMenu(): void {
     this.isMenuOpen.update((open) => !open);

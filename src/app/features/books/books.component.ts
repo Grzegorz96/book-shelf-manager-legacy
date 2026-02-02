@@ -1,4 +1,4 @@
-import { Component, inject, signal, resource, effect, computed } from '@angular/core';
+import { Component, signal, effect, computed, Resource } from '@angular/core';
 import { BooksService } from './books.service';
 import { BookCardComponent } from './book-card/book-card.component';
 import { BookCardSkeletonComponent } from './book-card-skeleton/book-card-skeleton.component';
@@ -6,6 +6,7 @@ import { LucideAngularModule } from 'lucide-angular';
 import { ErrorModalService } from '@shared/error-modal';
 import { FilterBarComponent } from './filter-bar/filter-bar.component';
 import { Router, RouterOutlet } from '@angular/router';
+import { Book } from './book.interface';
 
 @Component({
   selector: 'app-books',
@@ -20,14 +21,27 @@ import { Router, RouterOutlet } from '@angular/router';
   styleUrl: './books.component.scss',
 })
 export class BooksComponent {
-  private readonly router = inject(Router);
-  private readonly booksService = inject(BooksService);
-  private readonly errorModalService = inject(ErrorModalService);
-  protected readonly booksResource = this.booksService.booksResource;
   protected readonly skeletons = Array(9).fill(0);
   protected readonly filterGenre = signal<string>('');
+  protected readonly booksResource: Resource<Book[] | undefined>;
+  protected readonly filteredBooks = computed(() => {
+    if (!this.booksResource.hasValue()) return [];
 
-  constructor() {
+    const allBooks = this.booksResource.value();
+    const filter = this.filterGenre().toLowerCase().trim();
+
+    if (!filter) return allBooks;
+
+    return allBooks.filter((book) => book.genre.toLowerCase().includes(filter));
+  });
+
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly errorModalService: ErrorModalService,
+    private readonly router: Router
+  ) {
+    this.booksResource = this.booksService.booksResource;
+
     effect(() => {
       if (this.booksResource.error()) {
         this.errorModalService.openErrorModal({
@@ -41,17 +55,6 @@ export class BooksComponent {
       }
     });
   }
-
-  protected readonly filteredBooks = computed(() => {
-    if (!this.booksResource.hasValue()) return [];
-
-    const allBooks = this.booksResource.value();
-    const filter = this.filterGenre().toLowerCase().trim();
-
-    if (!filter) return allBooks;
-
-    return allBooks.filter((book) => book.genre.toLowerCase().includes(filter));
-  });
 
   async handleDeleteBook(id: string): Promise<void> {
     if (confirm('Are you sure you want to delete this book?')) {

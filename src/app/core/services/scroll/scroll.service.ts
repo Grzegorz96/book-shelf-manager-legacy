@@ -1,12 +1,13 @@
-import { Injectable, signal, effect, RendererFactory2, inject } from '@angular/core';
+import { Injectable, signal, effect, RendererFactory2, Renderer2 } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class ScrollService {
-  private renderer = inject(RendererFactory2).createRenderer(null, null);
+  private readonly renderer: Renderer2;
+  private readonly blockedCount = signal(0);
 
-  private blockedCount = signal(0);
+  constructor(rendererFactory: RendererFactory2) {
+    this.renderer = rendererFactory.createRenderer(null, null);
 
-  constructor() {
     effect(() => {
       if (this.blockedCount() > 0) {
         this.renderer.setStyle(document.documentElement, 'overflow', 'hidden');

@@ -1,4 +1,4 @@
-import { Component, input, signal, effect, inject, resource } from '@angular/core';
+import { Component, input, signal, effect, Resource, resource } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LucideAngularModule } from 'lucide-angular';
 import { Book } from '../book.interface';
@@ -17,18 +17,8 @@ type BookFormModel = Omit<Book, 'id'>;
   styleUrl: './book-form.component.scss',
 })
 export class BookFormComponent {
-  private readonly router = inject(Router);
-  private readonly booksService = inject(BooksService);
-  private readonly errorModalService = inject(ErrorModalService);
   readonly id = input<string>();
-
-  protected readonly bookResource = resource({
-    params: () => ({ id: this.id() }),
-    loader: async ({ params }) => {
-      if (!params.id) return;
-      return await this.booksService.getBook(params.id);
-    },
-  });
+  protected readonly bookResource: Resource<Book | undefined>;
 
   private readonly _bookFormSignal = signal<BookFormModel>({
     title: '',
@@ -54,7 +44,19 @@ export class BookFormComponent {
     minLength(fieldPath.genre, 2, { message: 'Genre must be at least 2 character' });
   });
 
-  constructor() {
+  constructor(
+    private readonly router: Router,
+    private readonly booksService: BooksService,
+    private readonly errorModalService: ErrorModalService
+  ) {
+    this.bookResource = resource({
+      params: () => ({ id: this.id() }),
+      loader: async ({ params }) => {
+        if (!params.id) return;
+        return await this.booksService.getBook(params.id);
+      },
+    });
+
     effect(() => {
       if (this.bookResource.error()) {
         return;

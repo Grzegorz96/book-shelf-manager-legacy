@@ -1,11 +1,11 @@
-import { Directive, OnInit, OnDestroy, inject } from '@angular/core';
+import { Directive, OnInit, OnDestroy } from '@angular/core';
 import { ScrollService } from './scroll.service';
 
 @Directive({
   selector: '[appScrollLock]',
 })
 export class ScrollLockDirective implements OnInit, OnDestroy {
-  private scrollService = inject(ScrollService);
+  constructor(private readonly scrollService: ScrollService) {}
 
   ngOnInit() {
     this.scrollService.lock();
