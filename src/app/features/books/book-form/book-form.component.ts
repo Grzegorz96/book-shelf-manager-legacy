@@ -1,18 +1,26 @@
-import { Component, input, signal, effect, Resource, resource } from '@angular/core';
+import { Component, input, effect, Resource, resource } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { LucideAngularModule } from 'lucide-angular';
 import { Book } from '../book.interface';
-import { form, required, submit, minLength, max, FormField } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { BooksService } from '../books.service';
 import { ErrorModalService } from '@shared/error-modal';
 import { BookModalComponent } from '../book-modal';
+import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { KeyValuePipe } from '@angular/common';
+import { ValidationErrorPipe } from '@core/pipes';
 
 type BookFormModel = Omit<Book, 'id'>;
 
 @Component({
   selector: 'app-book-form',
-  imports: [LucideAngularModule, FormField, BookModalComponent],
+  imports: [
+    LucideAngularModule,
+    BookModalComponent,
+    ReactiveFormsModule,
+    KeyValuePipe,
+    ValidationErrorPipe,
+  ],
   templateUrl: './book-form.component.html',
   styleUrl: './book-form.component.scss',
 })
@@ -20,28 +28,31 @@ export class BookFormComponent {
   readonly id = input<string>();
   protected readonly bookResource: Resource<Book | undefined>;
 
-  private readonly _bookFormSignal = signal<BookFormModel>({
-    title: '',
-    author: '',
-    year: new Date().getFullYear(),
-    description: '',
-    genre: '',
-    isFavorite: false,
-  });
-
-  protected readonly bookForm = form(this._bookFormSignal, (fieldPath) => {
-    const currentYear = new Date().getFullYear();
-
-    required(fieldPath.title, { message: 'Title is required' });
-    minLength(fieldPath.title, 2, { message: 'Title must be at least 2 character' });
-    required(fieldPath.author, { message: 'Author is required' });
-    minLength(fieldPath.author, 2, { message: 'Author must be at least 2 character' });
-    required(fieldPath.year, { message: 'Year is required' });
-    max(fieldPath.year, currentYear, { message: `Year must be in the past` });
-    required(fieldPath.description, { message: 'Description is required' });
-    minLength(fieldPath.description, 10, { message: 'Description must be at least 10 characters' });
-    required(fieldPath.genre, { message: 'Genre is required' });
-    minLength(fieldPath.genre, 2, { message: 'Genre must be at least 2 character' });
+  protected readonly bookForm = new FormGroup({
+    title: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2)],
+    }),
+    author: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2)],
+    }),
+    year: new FormControl(new Date().getFullYear(), {
+      nonNullable: true,
+      validators: [Validators.required, Validators.max(new Date().getFullYear())],
+    }),
+    description: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(10)],
+    }),
+    genre: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(2)],
+    }),
+    isFavorite: new FormControl(false, {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
 
   constructor(
@@ -63,7 +74,7 @@ export class BookFormComponent {
       }
       const bookFromApi = this.bookResource.value();
       if (bookFromApi) {
-        this._bookFormSignal.set({
+        this.bookForm.patchValue({
           title: bookFromApi.title,
           author: bookFromApi.author,
           year: bookFromApi.year,
@@ -112,9 +123,13 @@ export class BookFormComponent {
     }
   }
 
-  handleSubmit(event: Event): void {
-    event.preventDefault();
-    submit(this.bookForm, (form) => this.saveProcess(form().value()));
+  handleSubmit(): void {
+    if (this.bookForm.valid) {
+      const formValue = this.bookForm.getRawValue();
+      this.saveProcess(formValue);
+    } else {
+      this.bookForm.markAllAsTouched();
+    }
   }
 
   handleCancel(): void {

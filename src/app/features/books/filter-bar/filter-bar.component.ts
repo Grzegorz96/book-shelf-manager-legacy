@@ -12,16 +12,18 @@ import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
 export class FilterBarComponent {
   protected readonly filterOutput = output<string>();
   protected readonly filterForm = new FormGroup({
-    bookByGenre: new FormControl(''),
+    bookByGenre: new FormControl('', {
+      nonNullable: true,
+    }),
   });
   public readonly isDisabled = input.required<boolean>();
 
   protected applyFilter(): void {
-    this.filterOutput.emit(this.filterForm.value.bookByGenre ?? '');
+    this.filterOutput.emit(this.filterForm.getRawValue().bookByGenre);
   }
 
   protected clearFilter(): void {
-    this.filterForm.patchValue({ bookByGenre: '' });
+    this.filterForm.reset();
     this.filterOutput.emit('');
   }
 }
