@@ -1,4 +1,4 @@
-import { Injectable, inject, resource } from '@angular/core';
+import { Injectable, ResourceRef, Resource, resource } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Book } from './book.interface';
 import { firstValueFrom } from 'rxjs';
@@ -8,11 +8,15 @@ import { firstValueFrom } from 'rxjs';
 })
 export class BooksService {
   private readonly baseUrl = 'http://localhost:3001';
-  private readonly http = inject(HttpClient);
-  private readonly _booksResource = resource({
-    loader: () => this.getBooks(),
-  });
-  public readonly booksResource = this._booksResource.asReadonly();
+  private readonly _booksResource: ResourceRef<Book[] | undefined>;
+  public readonly booksResource: Resource<Book[] | undefined>;
+
+  constructor(private readonly http: HttpClient) {
+    this._booksResource = resource({
+      loader: () => this.getBooks(),
+    });
+    this.booksResource = this._booksResource.asReadonly();
+  }
 
   public updateCacheAfterAdd(newBook: Book) {
     this._booksResource.update((books) => (books ? [...books, newBook] : books));

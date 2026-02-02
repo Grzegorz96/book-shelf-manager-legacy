@@ -1,4 +1,4 @@
-import { Component, input, inject, resource, effect } from '@angular/core';
+import { Component, input, resource, effect, Resource } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReadingTimePipe } from '@core/pipes';
 import { BooksService } from '../books.service';
@@ -6,6 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ErrorModalService } from '@shared/error-modal';
 import { BookModalComponent } from '../book-modal';
+import { Book } from '../book.interface';
 
 @Component({
   selector: 'app-book-details',
@@ -15,16 +16,18 @@ import { BookModalComponent } from '../book-modal';
 })
 export class BookDetailsComponent {
   readonly id = input.required<string>();
-  private readonly booksService = inject(BooksService);
-  private readonly router = inject(Router);
-  private readonly errorModalService = inject(ErrorModalService);
+  protected readonly bookResource: Resource<Book | undefined>;
 
-  protected readonly bookResource = resource({
-    params: () => ({ id: this.id() }),
-    loader: ({ params }) => this.booksService.getBook(params.id),
-  });
+  constructor(
+    private readonly booksService: BooksService,
+    private readonly router: Router,
+    private readonly errorModalService: ErrorModalService
+  ) {
+    this.bookResource = resource({
+      params: () => ({ id: this.id() }),
+      loader: ({ params }) => this.booksService.getBook(params.id),
+    });
 
-  constructor() {
     effect(() => {
       const err = this.bookResource.error();
       if (!err) return;

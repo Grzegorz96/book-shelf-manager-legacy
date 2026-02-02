@@ -34,16 +34,96 @@ The app uses **json-server** as a mock API. The `db.json` file is **not** in the
 ```json
 {
   "books": [
-    { "id": "1", "title": "Diuna", "author": "Frank Herbert", "year": 1965, "description": "Epicka opowieść o polityce i religii na pustynnej planecie Arrakis.", "genre": "Sci-Fi", "isFavorite": true },
-    { "id": "2", "title": "Wiedźmin: Ostatnie życzenie", "author": "Andrzej Sapkowski", "year": 1993, "description": "Przygody Geralta z Rivii, płatnego zabójcy potworów.", "genre": "Fantasy", "isFavorite": true },
-    { "id": "3", "title": "Rok 1984", "author": "George Orwell", "year": 1949, "description": "Totalitarna wizja przyszłości pod okiem Wielkiego Brata.", "genre": "Dystopia", "isFavorite": false },
-    { "id": "4", "title": "Hobbit", "author": "J.R.R. Tolkien", "year": 1937, "description": "Wyprawa Bilbo Bagginsa do Samotnej Góry.", "genre": "Fantasy", "isFavorite": false },
-    { "id": "5", "title": "Cień wiatru", "author": "Carlos Ruiz Zafón", "year": 2001, "description": "Tajemnica zapomnianej książki w powojennej Barcelonie.", "genre": "Mystery", "isFavorite": true },
-    { "id": "6", "title": "Metro 2033", "author": "Dmitry Glukhovsky", "year": 2005, "description": "Walka o przetrwanie w tunelach moskiewskiego metra.", "genre": "Post-apoc", "isFavorite": false },
-    { "id": "7", "title": "Studium w szkarłacie", "author": "A.C. Doyle", "year": 1887, "description": "Pierwsza sprawa Sherlocka Holmesa i Doktora Watsona.", "genre": "Kryminał", "isFavorite": false },
-    { "id": "8", "title": "Fundacja", "author": "Isaac Asimov", "year": 1951, "description": "Plan ratowania cywilizacji galaktycznej przed upadkiem.", "genre": "Sci-Fi", "isFavorite": true },
-    { "id": "9", "title": "Zbrodnia i kara", "author": "Fiodor Dostojewski", "year": 1866, "description": "Dylematy moralne Raskolnikowa po dokonaniu zbrodni.", "genre": "Klasyka", "isFavorite": false },
-    { "id": "10", "title": "Problem trzech ciał", "author": "Cixin Liu", "year": 2008, "description": "Kontakt z obcą cywilizacją zmienia losy ludzkości.", "genre": "Sci-Fi", "isFavorite": true }
+    {
+      "id": "1",
+      "title": "Diuna",
+      "author": "Frank Herbert",
+      "year": 1965,
+      "description": "Epicka opowieść o polityce i religii na pustynnej planecie Arrakis.",
+      "genre": "Sci-Fi",
+      "isFavorite": true
+    },
+    {
+      "id": "2",
+      "title": "Wiedźmin: Ostatnie życzenie",
+      "author": "Andrzej Sapkowski",
+      "year": 1993,
+      "description": "Przygody Geralta z Rivii, płatnego zabójcy potworów.",
+      "genre": "Fantasy",
+      "isFavorite": true
+    },
+    {
+      "id": "3",
+      "title": "Rok 1984",
+      "author": "George Orwell",
+      "year": 1949,
+      "description": "Totalitarna wizja przyszłości pod okiem Wielkiego Brata.",
+      "genre": "Dystopia",
+      "isFavorite": false
+    },
+    {
+      "id": "4",
+      "title": "Hobbit",
+      "author": "J.R.R. Tolkien",
+      "year": 1937,
+      "description": "Wyprawa Bilbo Bagginsa do Samotnej Góry.",
+      "genre": "Fantasy",
+      "isFavorite": false
+    },
+    {
+      "id": "5",
+      "title": "Cień wiatru",
+      "author": "Carlos Ruiz Zafón",
+      "year": 2001,
+      "description": "Tajemnica zapomnianej książki w powojennej Barcelonie.",
+      "genre": "Mystery",
+      "isFavorite": true
+    },
+    {
+      "id": "6",
+      "title": "Metro 2033",
+      "author": "Dmitry Glukhovsky",
+      "year": 2005,
+      "description": "Walka o przetrwanie w tunelach moskiewskiego metra.",
+      "genre": "Post-apoc",
+      "isFavorite": false
+    },
+    {
+      "id": "7",
+      "title": "Studium w szkarłacie",
+      "author": "A.C. Doyle",
+      "year": 1887,
+      "description": "Pierwsza sprawa Sherlocka Holmesa i Doktora Watsona.",
+      "genre": "Kryminał",
+      "isFavorite": false
+    },
+    {
+      "id": "8",
+      "title": "Fundacja",
+      "author": "Isaac Asimov",
+      "year": 1951,
+      "description": "Plan ratowania cywilizacji galaktycznej przed upadkiem.",
+      "genre": "Sci-Fi",
+      "isFavorite": true
+    },
+    {
+      "id": "9",
+      "title": "Zbrodnia i kara",
+      "author": "Fiodor Dostojewski",
+      "year": 1866,
+      "description": "Dylematy moralne Raskolnikowa po dokonaniu zbrodni.",
+      "genre": "Klasyka",
+      "isFavorite": false
+    },
+    {
+      "id": "10",
+      "title": "Problem trzech ciał",
+      "author": "Cixin Liu",
+      "year": 2008,
+      "description": "Kontakt z obcą cywilizacją zmienia losy ludzkości.",
+      "genre": "Sci-Fi",
+      "isFavorite": true
+    }
   ]
 }
 ```
@@ -74,13 +154,13 @@ Both servers must be running at the same time – Angular fetches books from `ht
 
 ## Available scripts
 
-| Command               | Description                                  |
-|-----------------------|----------------------------------------------|
-| `npm start`           | Start dev server (port 4200)                 |
-| `npm run build`       | Build for production into `dist/`            |
-| `npm run watch`       | Build in watch mode (development)            |
-| `npm run json-server` | Start mock API with `db.json` (port 3001)   |
-| `npm test`            | Run unit tests (Vitest)                     |
+| Command               | Description                               |
+| --------------------- | ----------------------------------------- |
+| `npm start`           | Start dev server (port 4200)              |
+| `npm run build`       | Build for production into `dist/`         |
+| `npm run watch`       | Build in watch mode (development)         |
+| `npm run json-server` | Start mock API with `db.json` (port 3001) |
+| `npm test`            | Run unit tests (Vitest)                   |
 
 ## App structure (overview)
 
