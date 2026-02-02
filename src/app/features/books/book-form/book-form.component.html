@@ -2,7 +2,7 @@
 <app-book-modal [loader]="true" loaderText="Loading book..." />
 } @if (!bookResource.error() && !bookResource.isLoading()) {
 <app-book-modal (close)="handleCancel()">
-  <form (submit)="handleSubmit($event)" class="book-form">
+  <form [formGroup]="bookForm" (ngSubmit)="handleSubmit()" class="book-form">
     <h3 class="book-form__title">{{ bookResource.value() ? 'Edit Book' : 'Add New Book' }}</h3>
 
     <div class="book-form__field">
@@ -10,14 +10,16 @@
       <input
         id="title"
         type="text"
-        [formField]="bookForm.title"
+        formControlName="title"
         class="book-form__input"
-        [class.book-form__input--error]="bookForm.title().invalid() && bookForm.title().touched()"
+        [class.book-form__input--error]="
+          bookForm.get('title')?.invalid && bookForm.get('title')?.touched
+        "
       />
-      @if (bookForm.title().invalid() && bookForm.title().touched()) { @for (error of
-      bookForm.title().errors(); track error.kind) {
+      @if (bookForm.get('title')?.invalid && bookForm.get('title')?.touched) { @for (error of
+      bookForm.get('title')?.errors | keyvalue; track error.key) {
       <span class="book-form__error">
-        {{ error.message }}
+        {{ error.key | validationError : error.value }}
       </span>
       } }
     </div>
@@ -27,14 +29,16 @@
       <input
         id="author"
         type="text"
-        [formField]="bookForm.author"
+        formControlName="author"
         class="book-form__input"
-        [class.book-form__input--error]="bookForm.author().invalid() && bookForm.author().touched()"
+        [class.book-form__input--error]="
+          bookForm.get('author')?.invalid && bookForm.get('author')?.touched
+        "
       />
-      @if (bookForm.author().invalid() && bookForm.author().touched()) { @for (error of
-      bookForm.author().errors(); track error.kind) {
+      @if (bookForm.get('author')?.invalid && bookForm.get('author')?.touched) { @for (error of
+      bookForm.get('author')?.errors | keyvalue; track error.key) {
       <span class="book-form__error">
-        {{ error.message }}
+        {{ error.key | validationError : error.value }}
       </span>
       } }
     </div>
@@ -44,14 +48,16 @@
       <input
         id="year"
         type="number"
-        [formField]="bookForm.year"
+        formControlName="year"
         class="book-form__input"
-        [class.book-form__input--error]="bookForm.year().invalid() && bookForm.year().touched()"
+        [class.book-form__input--error]="
+          bookForm.get('year')?.invalid && bookForm.get('year')?.touched
+        "
       />
-      @if (bookForm.year().invalid() && bookForm.year().touched()) { @for (error of
-      bookForm.year().errors(); track error.kind) {
+      @if (bookForm.get('year')?.invalid && bookForm.get('year')?.touched) { @for (error of
+      bookForm.get('year')?.errors | keyvalue; track error.key) {
       <span class="book-form__error">
-        {{ error.message }}
+        {{ error.key | validationError : error.value }}
       </span>
       } }
     </div>
@@ -61,14 +67,16 @@
       <input
         id="genre"
         type="text"
-        [formField]="bookForm.genre"
+        formControlName="genre"
         class="book-form__input"
-        [class.book-form__input--error]="bookForm.genre().invalid() && bookForm.genre().touched()"
+        [class.book-form__input--error]="
+          bookForm.get('genre')?.invalid && bookForm.get('genre')?.touched
+        "
       />
-      @if (bookForm.genre().invalid() && bookForm.genre().touched()) { @for (error of
-      bookForm.genre().errors(); track error.kind) {
+      @if (bookForm.get('genre')?.invalid && bookForm.get('genre')?.touched) { @for (error of
+      bookForm.get('genre')?.errors | keyvalue; track error.key) {
       <span class="book-form__error">
-        {{ error.message }}
+        {{ error.key | validationError : error.value }}
       </span>
       } }
     </div>
@@ -77,26 +85,26 @@
       <label for="description" class="book-form__label">Description *</label>
       <textarea
         id="description"
-        [formField]="bookForm.description"
+        formControlName="description"
         rows="4"
         class="book-form__textarea"
         [class.book-form__textarea--error]="
-          bookForm.description().invalid() && bookForm.description().touched()
+          bookForm.get('description')?.invalid && bookForm.get('description')?.touched
         "
       ></textarea>
-      @if (bookForm.description().invalid() && bookForm.description().touched()) { @for (error of
-      bookForm.description().errors(); track error.kind) {
+      @if (bookForm.get('description')?.invalid && bookForm.get('description')?.touched) { @for
+      (error of bookForm.get('description')?.errors | keyvalue; track error.key) {
       <span class="book-form__error">
-        {{ error.message }}
+        {{ error.key | validationError : error.value }}
       </span>
       } }
     </div>
 
     <div class="book-form__field">
       <Label class="book-form__checkbox-label">
-        <input type="checkbox" [formField]="bookForm.isFavorite" class="book-form__checkbox" />
+        <input type="checkbox" formControlName="isFavorite" class="book-form__checkbox" />
 
-        @if (bookForm.isFavorite().value()) {
+        @if (bookForm.get('isFavorite')?.value) {
         <lucide-angular name="SquareCheck" class="book-form__checkbox-icon" />
         } @else {
         <lucide-angular name="Square" class="book-form__checkbox-icon" />
@@ -106,11 +114,7 @@
     </div>
 
     <div class="book-form__actions">
-      <button
-        type="submit"
-        class="app-button app-button--primary"
-        [disabled]="bookForm().invalid()"
-      >
+      <button type="submit" class="app-button app-button--primary" [disabled]="bookForm.invalid">
         {{ bookResource.value() ? 'Update' : 'Add' }} Book
       </button>
       <button type="button" class="app-button app-button--secondary" (click)="handleCancel()">
