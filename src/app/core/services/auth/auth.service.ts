@@ -1,24 +1,25 @@
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable } from '@angular/core';
 import type { AuthCredentials } from './auth-credentials.interface';
 import type { AuthResponse } from './auth-response-interface';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private readonly AUTH_KEY = 'shelfy-auth-status';
-  private readonly _isAuthenticated = signal<boolean>(this.getInitialAuthStatus());
-  public readonly isAuthenticated = this._isAuthenticated.asReadonly();
+  private readonly _isAuthenticated$ = new BehaviorSubject<boolean>(this.getInitialAuthStatus());
+  public readonly isAuthenticated$ = this._isAuthenticated$.asObservable();
 
   constructor() {
-    effect(() => {
-      localStorage.setItem(this.AUTH_KEY, JSON.stringify(this._isAuthenticated()));
+    this._isAuthenticated$.subscribe((isAuthenticated) => {
+      localStorage.setItem(this.AUTH_KEY, JSON.stringify(isAuthenticated));
     });
   }
 
   login(credentials: AuthCredentials): AuthResponse {
-    this._isAuthenticated.set(true);
     console.log('auth service received credentials:', credentials);
+    this._isAuthenticated$.next(true);
 
     return {
       success: true,
@@ -27,7 +28,7 @@ export class AuthService {
   }
 
   logout(): AuthResponse {
-    this._isAuthenticated.set(false);
+    this._isAuthenticated$.next(false);
     console.log('auth service logged out');
 
     return {

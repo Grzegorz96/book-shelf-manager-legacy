@@ -1,9 +1,9 @@
-@if (bookResource.isLoading()) {
+@if (state$ | async; as bookState) { @if (bookState.isLoading) {
 <app-book-modal [loader]="true" loaderText="Loading book..." />
-} @if (!bookResource.error() && !bookResource.isLoading()) {
+} @else if (!bookState.isLoading && !bookState.error) {
 <app-book-modal (close)="handleCancel()">
   <form [formGroup]="bookForm" (ngSubmit)="handleSubmit()" class="book-form">
-    <h3 class="book-form__title">{{ bookResource.value() ? 'Edit Book' : 'Add New Book' }}</h3>
+    <h3 class="book-form__title">{{ (id$ | async) ? 'Edit Book' : 'Add New Book' }}</h3>
 
     <div class="book-form__field">
       <label for="title" class="book-form__label">Title *</label>
@@ -114,8 +114,12 @@
     </div>
 
     <div class="book-form__actions">
-      <button type="submit" class="app-button app-button--primary" [disabled]="bookForm.invalid">
-        {{ bookResource.value() ? 'Update' : 'Add' }} Book
+      <button
+        type="submit"
+        class="app-button app-button--primary"
+        [disabled]="bookForm.invalid || bookState.isSaving"
+      >
+        {{ (id$ | async) ? 'Update' : 'Add' }} Book
       </button>
       <button type="button" class="app-button app-button--secondary" (click)="handleCancel()">
         Cancel
@@ -123,4 +127,4 @@
     </div>
   </form>
 </app-book-modal>
-}
+} }

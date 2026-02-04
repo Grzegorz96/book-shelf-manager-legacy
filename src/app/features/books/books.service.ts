@@ -1,76 +1,99 @@
-import { Injectable, ResourceRef, Resource, resource } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Book } from './book.interface';
-import { firstValueFrom } from 'rxjs';
+import { BehaviorSubject, delay, finalize } from 'rxjs';
+
+export interface BooksState {
+  data: Book[];
+  isLoading: boolean;
+  error: string | null;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class BooksService {
   private readonly baseUrl = 'http://localhost:3001';
-  private readonly _booksResource: ResourceRef<Book[] | undefined>;
-  public readonly booksResource: Resource<Book[] | undefined>;
+
+  private readonly _state$ = new BehaviorSubject<BooksState>({
+    data: [],
+    isLoading: false,
+    error: null,
+  });
+
+  public readonly state$ = this._state$.asObservable();
 
   constructor(private readonly http: HttpClient) {
-    this._booksResource = resource({
-      loader: () => this.getBooks(),
-    });
-    this.booksResource = this._booksResource.asReadonly();
+    this.loadBooks();
   }
 
-  public updateCacheAfterAdd(newBook: Book) {
-    this._booksResource.update((books) => (books ? [...books, newBook] : books));
+  private get state(): BooksState {
+    return this._state$.value;
   }
 
-  public updateCacheAfterEdit(updatedBook: Book) {
-    this._booksResource.update((books) =>
-      books?.map((book) => (book.id === updatedBook.id ? updatedBook : book))
-    );
+  private updateState(patch: Partial<BooksState>) {
+    this._state$.next({ ...this.state, ...patch });
   }
 
-  public updateCacheAfterDelete(id: string) {
-    this._booksResource.update((books) => books?.filter((book) => book.id !== id));
-  }
+  public loadBooks(): void {
+    this.updateState({ isLoading: true, error: null });
 
-  public updateCacheAfterToggleFavorite(updatedBook: Book) {
-    this._booksResource.update((books) =>
-      books?.map((book) => (book.id === updatedBook.id ? updatedBook : book))
-    );
+    this.getBooks()
+      .pipe(finalize(() => this.updateState({ isLoading: false })))
+      .subscribe({
+        next: (books) => this.updateState({ data: books }),
+        error: (err) => {
+          console.error(err);
+          this.updateState({ error: 'Failed to load books' });
+        },
+      });
   }
 
   public reloadCache() {
-    this._booksResource.reload();
+    this.loadBooks();
+  }
+
+  public updateCacheAfterAdd(newBook: Book) {
+    this.updateState({ data: [...this.state.data, newBook] });
+  }
+
+  public updateCacheAfterEdit(updatedBook: Book) {
+    this.updateState({
+      data: this.state.data.map((book) => (book.id === updatedBook.id ? updatedBook : book)),
+    });
+  }
+
+  public updateCacheAfterDelete(id: string) {
+    this.updateState({ data: this.state.data.filter((book) => book.id !== id) });
+  }
+
+  public updateCacheAfterToggleFavorite(updatedBook: Book) {
+    this.updateState({
+      data: this.state.data.map((book) => (book.id === updatedBook.id ? updatedBook : book)),
+    });
   }
 
   public getBooks() {
-    return new Promise<Book[]>((resolve) => {
-      setTimeout(() => {
-        resolve(firstValueFrom(this.http.get<Book[]>(`${this.baseUrl}/books`)));
-      }, 1000);
-    });
+    return this.http.get<Book[]>(`${this.baseUrl}/books`).pipe(delay(1000));
   }
 
   public getBook(id: string) {
-    return new Promise<Book>((resolve) => {
-      setTimeout(() => {
-        resolve(firstValueFrom(this.http.get<Book>(`${this.baseUrl}/books/${id}`)));
-      }, 500);
-    });
+    return this.http.get<Book>(`${this.baseUrl}/books/${id}`).pipe(delay(500));
   }
 
   public createBook(book: Omit<Book, 'id'>) {
-    return firstValueFrom(this.http.post<Book>(`${this.baseUrl}/books`, book));
+    return this.http.post<Book>(`${this.baseUrl}/books`, book).pipe(delay(500));
   }
 
   public updateBook(id: string, book: Partial<Book>) {
-    return firstValueFrom(this.http.patch<Book>(`${this.baseUrl}/books/${id}`, book));
+    return this.http.patch<Book>(`${this.baseUrl}/books/${id}`, book).pipe(delay(500));
   }
 
   public deleteBook(id: string) {
-    return firstValueFrom(this.http.delete<Book>(`${this.baseUrl}/books/${id}`));
+    return this.http.delete<Book>(`${this.baseUrl}/books/${id}`).pipe(delay(500));
   }
 
   public toggleFavorite(id: string, isFavorite: boolean) {
-    return firstValueFrom(this.http.patch<Book>(`${this.baseUrl}/books/${id}`, { isFavorite }));
+    return this.http.patch<Book>(`${this.baseUrl}/books/${id}`, { isFavorite }).pipe(delay(500));
   }
 }

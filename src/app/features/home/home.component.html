@@ -1,3 +1,5 @@
+@let isAuthenticated = isAuthenticated$ | async;
+
 <section class="home">
   <!-- Hero Section -->
   <div class="home__hero">
@@ -12,20 +14,20 @@
         favorites. Keep all your books organized in one beautiful place.
       </p>
       <div class="home__hero-actions">
-        @if (isAuthenticated()) {
-          <a routerLink="/books" class="home__cta-button app-button app-button--primary">
-            <lucide-angular name="LibraryBig" class="home__cta-icon" />
-            <span>View My Books</span>
-          </a>
+        @if (isAuthenticated) {
+        <a routerLink="/books" class="home__cta-button app-button app-button--primary">
+          <lucide-angular name="LibraryBig" class="home__cta-icon" />
+          <span>View My Books</span>
+        </a>
         } @else {
-          <a routerLink="/auth" class="app-button app-button--primary home__cta-button">
-            <lucide-angular name="LogIn" class="home__cta-icon" />
-            <span>Get Started</span>
-          </a>
-          <a routerLink="/books" class="app-button app-button--secondary home__cta-button">
-            <lucide-angular name="LibraryBig" class="home__cta-icon" />
-            <span>Browse Books</span>
-          </a>
+        <a routerLink="/auth" class="app-button app-button--primary home__cta-button">
+          <lucide-angular name="LogIn" class="home__cta-icon" />
+          <span>Get Started</span>
+        </a>
+        <a routerLink="/books" class="app-button app-button--secondary home__cta-button">
+          <lucide-angular name="LibraryBig" class="home__cta-icon" />
+          <span>Browse Books</span>
+        </a>
         }
       </div>
     </div>
@@ -84,19 +86,19 @@
   </div>
 
   <!-- CTA Section -->
-  @if (!isAuthenticated()) {
-    <div class="home__cta-section">
-      <div class="home__cta-content">
-        <h2 class="home__cta-title">Ready to start organizing your books?</h2>
-        <p class="home__cta-description">
-          Join Shelfy today and take control of your personal library. It's free and takes just a
-          moment to get started.
-        </p>
-        <a routerLink="/auth" class="app-button app-button--primary home__cta-button">
-          <lucide-angular name="LogIn" class="home__cta-icon" />
-          <span>Sign In Now</span>
-        </a>
-      </div>
+  @if (!isAuthenticated) {
+  <div class="home__cta-section">
+    <div class="home__cta-content">
+      <h2 class="home__cta-title">Ready to start organizing your books?</h2>
+      <p class="home__cta-description">
+        Join Shelfy today and take control of your personal library. It's free and takes just a
+        moment to get started.
+      </p>
+      <a routerLink="/auth" class="app-button app-button--primary home__cta-button">
+        <lucide-angular name="LogIn" class="home__cta-icon" />
+        <span>Sign In Now</span>
+      </a>
     </div>
+  </div>
   }
 </section>

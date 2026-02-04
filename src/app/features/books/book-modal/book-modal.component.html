@@ -1,13 +1,13 @@
 <div class="book-modal" appScrollLock appBackdropClick (backdropClick)="onBackdropClick()">
   <div
     class="book-modal__dialog"
-    [class.book-modal__dialog--loader]="loader()"
+    [class.book-modal__dialog--loader]="loader"
     (click)="$event.stopPropagation()"
     role="dialog"
-    [attr.aria-label]="loader() ? 'Loading' : 'Book modal'"
+    [attr.aria-label]="loader ? 'Loading' : 'Book modal'"
     aria-modal="true"
   >
-    @if (!loader()) {
+    @if (!loader) {
     <button
       class="book-modal__close-button"
       type="button"
@@ -16,10 +16,10 @@
     >
       <lucide-angular name="X" class="book-modal__close-button-icon" />
     </button>
-    } @if (loader()) {
+    } @if (loader) {
     <div class="book-modal__loader">
       <div class="book-modal__loader-spinner" aria-hidden="true"></div>
-      <p class="book-modal__loader-text">{{ loaderText() }}</p>
+      <p class="book-modal__loader-text">{{ loaderText }}</p>
     </div>
     } @else {
     <ng-content />

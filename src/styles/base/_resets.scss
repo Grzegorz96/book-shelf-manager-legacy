@@ -49,6 +49,18 @@ button {
   border: none;
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px color('input') inset !important;
+
+  -webkit-text-fill-color: color('foreground') !important;
+  caret-color: color('foreground') !important;
+
+  transition: background-color 9999999s ease-in-out 0s !important;
+}
+
 table {
   border-collapse: collapse;
   border-spacing: 0;

@@ -1,15 +1,23 @@
-# Book Shelf Manager
+# Book Shelf Manager (Legacy)
 
-A book library management app built with **Angular 21**. It lets you browse books, add, edit, delete, mark favorites, and filter by genre. It includes authentication, light/dark theme, and a mock API powered by [json-server](https://github.com/typicode/json-server).
+A book library management app built with **Angular 21** in a **legacy style** for learning purposes. It lets you browse books, add, edit, delete, mark favorites, and filter by genre. It includes authentication, light/dark theme, and a mock API powered by [json-server](https://github.com/typicode/json-server).
+
+This project deliberately uses **classic Angular patterns** (decorators, constructor injection, RxJS) instead of the newer APIs (signals, `inject()`, etc.), so you can learn and compare both approaches.
 
 ## Tech stack
 
-- **Angular** 21 (standalone components, signals, control flow)
-- **RxJS** 7.8
+- **Angular** 21 (standalone components)
+- **RxJS** 7.8 – state and async flow (Observables, Subjects, BehaviorSubject) instead of signals
 - **Lucide Angular** (icons)
 - **json-server** (mock REST API)
 - **SCSS** (BEM, abstracts, variables)
 - **Vitest** (unit tests)
+
+## Legacy-style conventions (this project)
+
+- **Decorators** – `@Input()`, `@Output()`, `@Component()`, etc. for component API and metadata
+- **Constructor injection** – services injected via constructor parameters instead of `inject()`
+- **RxJS** – reactive state and data flow with Observables/Subjects instead of `signal()` and `computed()`
 
 ## Prerequisites
 

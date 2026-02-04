@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, HostListener, output } from '@angular/core';
+import { Directive, EventEmitter, HostListener, Output } from '@angular/core';
 
 /**
  * Use on a modal/overlay backdrop element. Emits only when the user performs a full click
@@ -14,7 +14,8 @@ import { Directive, EventEmitter, HostListener, output } from '@angular/core';
 })
 export class BackdropClickDirective {
   /** Emitted when a full click (mousedown and mouseup) occurred on the host element. */
-  readonly backdropClick = output<void>();
+  // readonly backdropClick = output<void>();
+  @Output() backdropClick = new EventEmitter<void>();
 
   private _mouseDownTarget: EventTarget | null = null;
 
