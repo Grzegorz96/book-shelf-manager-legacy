@@ -74,15 +74,12 @@ export class BooksComponent {
         .deleteBook(id)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: (deletedBook: Book) => {
-            this.booksService.updateCacheAfterDelete(deletedBook.id);
-          },
           error: () => {
             this.errorModalService.openErrorModal({
               title: 'Error deleting book',
               message: 'An error occurred while deleting the book.',
               actionLabel: 'Retry',
-              onAction: async (): Promise<void> => this.handleDeleteBook(id),
+              onAction: () => this.handleDeleteBook(id),
             });
           },
         });
@@ -94,15 +91,12 @@ export class BooksComponent {
       .toggleFavorite(id, isFavorite)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (updatedBook: Book) => {
-          this.booksService.updateCacheAfterToggleFavorite(updatedBook);
-        },
         error: () => {
           this.errorModalService.openErrorModal({
             title: 'Error updating favorite',
             message: 'An error occurred while updating the book.',
             actionLabel: 'Retry',
-            onAction: async (): Promise<void> => this.handleToggleFavorite(id, isFavorite),
+            onAction: () => this.handleToggleFavorite(id, isFavorite),
           });
         },
       });

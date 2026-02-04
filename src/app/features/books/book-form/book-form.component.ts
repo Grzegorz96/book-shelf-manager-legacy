@@ -134,16 +134,8 @@ export class BookFormComponent implements OnInit {
     this.state$.next({ ...this.state$.value, isSaving: true });
 
     const request$ = id
-      ? this.booksService.updateBook(id, formValue).pipe(
-          tap((updatedBook) => {
-            this.booksService.updateCacheAfterEdit(updatedBook);
-          })
-        )
-      : this.booksService.createBook(formValue).pipe(
-          tap((createdBook) => {
-            this.booksService.updateCacheAfterAdd(createdBook);
-          })
-        );
+      ? this.booksService.updateBook(id, formValue)
+      : this.booksService.createBook(formValue);
 
     request$
       .pipe(

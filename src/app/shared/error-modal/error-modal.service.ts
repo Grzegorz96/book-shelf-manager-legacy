@@ -2,11 +2,8 @@ import { Injectable } from '@angular/core';
 import { ErrorModalState } from './error-modal.interface';
 import { BehaviorSubject } from 'rxjs';
 
-/** Callback for primary action; may be sync or async. */
-type actionCallback = () => Promise<void> | void;
-
 export interface OpenErrorModalParams extends ErrorModalState {
-  onAction?: actionCallback;
+  onAction?: () => void;
   /** Called when modal is closed by dismiss (Cancel, X, overlay). Not called when primary action is used. */
   onDismiss?: () => void;
 }
@@ -22,7 +19,7 @@ export class ErrorModalService {
   private readonly _state$ = new BehaviorSubject<ErrorModalState | null>(null);
   public readonly state$ = this._state$.asObservable();
 
-  private onAction: actionCallback | null = null;
+  private onAction: (() => void) | null = null;
   private onDismiss: (() => void) | null = null;
 
   openErrorModal(params: OpenErrorModalParams): void {
@@ -49,7 +46,7 @@ export class ErrorModalService {
   }
 
   executeAction(): void {
-    const action: actionCallback | null = this.onAction;
+    const action: (() => void) | null = this.onAction;
 
     this.resetState();
 

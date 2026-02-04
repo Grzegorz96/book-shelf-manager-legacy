@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Book } from './book.interface';
-import { BehaviorSubject, delay, finalize } from 'rxjs';
+import { BehaviorSubject, delay, finalize, tap } from 'rxjs';
 
 export interface BooksState {
   data: Book[];
@@ -35,7 +35,7 @@ export class BooksService {
     this._state$.next({ ...this.state, ...patch });
   }
 
-  public loadBooks(): void {
+  private loadBooks(): void {
     this.updateState({ isLoading: true, error: null });
 
     this.getBooks()
@@ -53,24 +53,18 @@ export class BooksService {
     this.loadBooks();
   }
 
-  public updateCacheAfterAdd(newBook: Book) {
+  private updateCacheAfterAdd(newBook: Book) {
     this.updateState({ data: [...this.state.data, newBook] });
   }
 
-  public updateCacheAfterEdit(updatedBook: Book) {
+  private updateCacheAfterEdit(updatedBook: Book) {
     this.updateState({
       data: this.state.data.map((book) => (book.id === updatedBook.id ? updatedBook : book)),
     });
   }
 
-  public updateCacheAfterDelete(id: string) {
+  private updateCacheAfterDelete(id: string) {
     this.updateState({ data: this.state.data.filter((book) => book.id !== id) });
-  }
-
-  public updateCacheAfterToggleFavorite(updatedBook: Book) {
-    this.updateState({
-      data: this.state.data.map((book) => (book.id === updatedBook.id ? updatedBook : book)),
-    });
   }
 
   public getBooks() {
@@ -82,18 +76,38 @@ export class BooksService {
   }
 
   public createBook(book: Omit<Book, 'id'>) {
-    return this.http.post<Book>(`${this.baseUrl}/books`, book).pipe(delay(500));
+    return this.http.post<Book>(`${this.baseUrl}/books`, book).pipe(
+      delay(500),
+      tap((createdBook: Book) => {
+        this.updateCacheAfterAdd(createdBook);
+      })
+    );
   }
 
   public updateBook(id: string, book: Partial<Book>) {
-    return this.http.patch<Book>(`${this.baseUrl}/books/${id}`, book).pipe(delay(500));
+    return this.http.patch<Book>(`${this.baseUrl}/books/${id}`, book).pipe(
+      delay(500),
+      tap((updatedBook: Book) => {
+        this.updateCacheAfterEdit(updatedBook);
+      })
+    );
   }
 
   public deleteBook(id: string) {
-    return this.http.delete<Book>(`${this.baseUrl}/books/${id}`).pipe(delay(500));
+    return this.http.delete<Book>(`${this.baseUrl}/books/${id}`).pipe(
+      delay(500),
+      tap((daletedBook: Book) => {
+        this.updateCacheAfterDelete(daletedBook.id);
+      })
+    );
   }
 
   public toggleFavorite(id: string, isFavorite: boolean) {
-    return this.http.patch<Book>(`${this.baseUrl}/books/${id}`, { isFavorite }).pipe(delay(500));
+    return this.http.patch<Book>(`${this.baseUrl}/books/${id}`, { isFavorite }).pipe(
+      delay(500),
+      tap((updatedBook: Book) => {
+        this.updateCacheAfterEdit(updatedBook);
+      })
+    );
   }
 }
