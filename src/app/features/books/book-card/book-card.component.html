@@ -2,10 +2,10 @@
   <!-- Header -->
   <div class="book-card__header">
     <div class="book-card__badge">
-      <span>{{ book().genre }}</span>
+      <span>{{ book.genre }}</span>
     </div>
-    @if (book().isFavorite) {
-      <lucide-angular name="Star" class="book-card__favorite-indicator-icon" />
+    @if (book.isFavorite) {
+    <lucide-angular name="Star" class="book-card__favorite-indicator-icon" />
     }
   </div>
 
@@ -13,19 +13,19 @@
   <div class="book-card__content">
     <!-- Title and Author -->
     <div class="book-card__info">
-      <h3 class="book-card__title">{{ book().title }}</h3>
+      <h3 class="book-card__title">{{ book.title }}</h3>
       <div class="book-card__info-item">
         <lucide-angular name="NotebookPen" class="book-card__info-icon" />
-        <span class="book-card__info-text">{{ book().author }}</span>
+        <span class="book-card__info-text">{{ book.author }}</span>
       </div>
       <div class="book-card__info-item">
         <lucide-angular name="CalendarDays" class="book-card__info-icon" />
-        <span class="book-card__info-text">{{ book().year }}</span>
+        <span class="book-card__info-text">{{ book.year }}</span>
       </div>
     </div>
 
     <!-- Description -->
-    <p class="book-card__description">{{ book().description }}</p>
+    <p class="book-card__description">{{ book.description }}</p>
 
     <!-- Actions -->
     <div class="book-card__actions">
@@ -33,12 +33,12 @@
         <button
           class="book-card__icon-button"
           (click)="handleToggleFavorite()"
-          [attr.aria-label]="book().isFavorite ? 'Remove from favorites' : 'Add to favorites'"
+          [attr.aria-label]="book.isFavorite ? 'Remove from favorites' : 'Add to favorites'"
         >
           <lucide-angular
             name="Heart"
             class="book-card__icon"
-            [class.book-card__icon--favorite]="book().isFavorite"
+            [class.book-card__icon--favorite]="book.isFavorite"
           />
         </button>
         <button class="book-card__icon-button" (click)="handleEdit()" aria-label="Edit book">

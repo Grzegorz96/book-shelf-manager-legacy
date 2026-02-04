@@ -1,4 +1,4 @@
-<form (submit)="handleSubmit($event)" class="auth-form">
+<form [formGroup]="authForm" (ngSubmit)="handleSubmit()" class="auth-form">
   <h3 class="auth-form__title">Login</h3>
 
   <div class="auth-form__field">
@@ -7,17 +7,18 @@
       id="email"
       type="email"
       autocomplete="email"
-      [formField]="authForm.email"
+      formControlName="email"
       class="auth-form__input"
-      [class.auth-form__input--error]="authForm.email().invalid() && authForm.email().touched()"
+      [class.auth-form__input--error]="
+        authForm.get('email')?.invalid && authForm.get('email')?.touched
+      "
     />
-    @if (authForm.email().invalid() && authForm.email().touched()) {
-      @for (error of authForm.email().errors(); track error.kind) {
-        <span class="auth-form__error">
-          {{ error.message }}
-        </span>
-      }
-    }
+    @if (authForm.get('email')?.invalid && authForm.get('email')?.touched) { @for (error of
+    authForm.get('email')?.errors | keyvalue; track error.key) {
+    <span class="auth-form__error">
+      {{ error.key | validationError : error.value }}
+    </span>
+    } }
   </div>
 
   <div class="auth-form__field">
@@ -25,22 +26,21 @@
     <input
       id="password"
       type="password"
-      [formField]="authForm.password"
+      formControlName="password"
       class="auth-form__input"
       [class.auth-form__input--error]="
-        authForm.password().invalid() && authForm.password().touched()
+        authForm.get('password')?.invalid && authForm.get('password')?.touched
       "
     />
-    @if (authForm.password().invalid() && authForm.password().touched()) {
-      @for (error of authForm.password().errors(); track error.kind) {
-        <span class="auth-form__error">
-          {{ error.message }}
-        </span>
-      }
-    }
+    @if (authForm.get('password')?.invalid && authForm.get('password')?.touched) { @for (error of
+    authForm.get('password')?.errors | keyvalue; track error.key) {
+    <span class="auth-form__error">
+      {{ error.key | validationError : error.value }}
+    </span>
+    } }
   </div>
 
-  <button type="submit" class="app-button app-button--primary" [disabled]="authForm().invalid()">
+  <button type="submit" class="app-button app-button--primary" [disabled]="authForm.invalid">
     Login
   </button>
 </form>

@@ -1,4 +1,4 @@
-import { Component, output, input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
@@ -10,18 +10,21 @@ import { ReactiveFormsModule, FormGroup, FormControl } from '@angular/forms';
   styleUrl: './filter-bar.component.scss',
 })
 export class FilterBarComponent {
-  protected readonly filterOutput = output<string>();
+  @Input({ required: true }) public isDisabled!: boolean;
+  @Output() protected readonly filterOutput = new EventEmitter<string>();
+
   protected readonly filterForm = new FormGroup({
-    bookByGenre: new FormControl(''),
+    bookByGenre: new FormControl('', {
+      nonNullable: true,
+    }),
   });
-  public readonly isDisabled = input.required<boolean>();
 
   protected applyFilter(): void {
-    this.filterOutput.emit(this.filterForm.value.bookByGenre ?? '');
+    this.filterOutput.emit(this.filterForm.getRawValue().bookByGenre);
   }
 
   protected clearFilter(): void {
-    this.filterForm.patchValue({ bookByGenre: '' });
+    this.filterForm.reset();
     this.filterOutput.emit('');
   }
 }

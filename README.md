@@ -1,15 +1,23 @@
-# Book Shelf Manager
+# Book Shelf Manager (Legacy)
 
-A book library management app built with **Angular 21**. It lets you browse books, add, edit, delete, mark favorites, and filter by genre. It includes authentication, light/dark theme, and a mock API powered by [json-server](https://github.com/typicode/json-server).
+A book library management app built with **Angular 21** in a **legacy style** for learning purposes. It lets you browse books, add, edit, delete, mark favorites, and filter by genre. It includes authentication, light/dark theme, and a mock API powered by [json-server](https://github.com/typicode/json-server).
+
+This project deliberately uses **classic Angular patterns** (decorators, constructor injection, RxJS) instead of the newer APIs (signals, `inject()`, etc.), so you can learn and compare both approaches.
 
 ## Tech stack
 
-- **Angular** 21 (standalone components, signals, control flow)
-- **RxJS** 7.8
+- **Angular** 21 (standalone components)
+- **RxJS** 7.8 – state and async flow (Observables, Subjects, BehaviorSubject) instead of signals
 - **Lucide Angular** (icons)
 - **json-server** (mock REST API)
 - **SCSS** (BEM, abstracts, variables)
 - **Vitest** (unit tests)
+
+## Legacy-style conventions (this project)
+
+- **Decorators** – `@Input()`, `@Output()`, `@Component()`, etc. for component API and metadata
+- **Constructor injection** – services injected via constructor parameters instead of `inject()`
+- **RxJS** – reactive state and data flow with Observables/Subjects instead of `signal()` and `computed()`
 
 ## Prerequisites
 
@@ -34,16 +42,96 @@ The app uses **json-server** as a mock API. The `db.json` file is **not** in the
 ```json
 {
   "books": [
-    { "id": "1", "title": "Diuna", "author": "Frank Herbert", "year": 1965, "description": "Epicka opowieść o polityce i religii na pustynnej planecie Arrakis.", "genre": "Sci-Fi", "isFavorite": true },
-    { "id": "2", "title": "Wiedźmin: Ostatnie życzenie", "author": "Andrzej Sapkowski", "year": 1993, "description": "Przygody Geralta z Rivii, płatnego zabójcy potworów.", "genre": "Fantasy", "isFavorite": true },
-    { "id": "3", "title": "Rok 1984", "author": "George Orwell", "year": 1949, "description": "Totalitarna wizja przyszłości pod okiem Wielkiego Brata.", "genre": "Dystopia", "isFavorite": false },
-    { "id": "4", "title": "Hobbit", "author": "J.R.R. Tolkien", "year": 1937, "description": "Wyprawa Bilbo Bagginsa do Samotnej Góry.", "genre": "Fantasy", "isFavorite": false },
-    { "id": "5", "title": "Cień wiatru", "author": "Carlos Ruiz Zafón", "year": 2001, "description": "Tajemnica zapomnianej książki w powojennej Barcelonie.", "genre": "Mystery", "isFavorite": true },
-    { "id": "6", "title": "Metro 2033", "author": "Dmitry Glukhovsky", "year": 2005, "description": "Walka o przetrwanie w tunelach moskiewskiego metra.", "genre": "Post-apoc", "isFavorite": false },
-    { "id": "7", "title": "Studium w szkarłacie", "author": "A.C. Doyle", "year": 1887, "description": "Pierwsza sprawa Sherlocka Holmesa i Doktora Watsona.", "genre": "Kryminał", "isFavorite": false },
-    { "id": "8", "title": "Fundacja", "author": "Isaac Asimov", "year": 1951, "description": "Plan ratowania cywilizacji galaktycznej przed upadkiem.", "genre": "Sci-Fi", "isFavorite": true },
-    { "id": "9", "title": "Zbrodnia i kara", "author": "Fiodor Dostojewski", "year": 1866, "description": "Dylematy moralne Raskolnikowa po dokonaniu zbrodni.", "genre": "Klasyka", "isFavorite": false },
-    { "id": "10", "title": "Problem trzech ciał", "author": "Cixin Liu", "year": 2008, "description": "Kontakt z obcą cywilizacją zmienia losy ludzkości.", "genre": "Sci-Fi", "isFavorite": true }
+    {
+      "id": "1",
+      "title": "Diuna",
+      "author": "Frank Herbert",
+      "year": 1965,
+      "description": "Epicka opowieść o polityce i religii na pustynnej planecie Arrakis.",
+      "genre": "Sci-Fi",
+      "isFavorite": true
+    },
+    {
+      "id": "2",
+      "title": "Wiedźmin: Ostatnie życzenie",
+      "author": "Andrzej Sapkowski",
+      "year": 1993,
+      "description": "Przygody Geralta z Rivii, płatnego zabójcy potworów.",
+      "genre": "Fantasy",
+      "isFavorite": true
+    },
+    {
+      "id": "3",
+      "title": "Rok 1984",
+      "author": "George Orwell",
+      "year": 1949,
+      "description": "Totalitarna wizja przyszłości pod okiem Wielkiego Brata.",
+      "genre": "Dystopia",
+      "isFavorite": false
+    },
+    {
+      "id": "4",
+      "title": "Hobbit",
+      "author": "J.R.R. Tolkien",
+      "year": 1937,
+      "description": "Wyprawa Bilbo Bagginsa do Samotnej Góry.",
+      "genre": "Fantasy",
+      "isFavorite": false
+    },
+    {
+      "id": "5",
+      "title": "Cień wiatru",
+      "author": "Carlos Ruiz Zafón",
+      "year": 2001,
+      "description": "Tajemnica zapomnianej książki w powojennej Barcelonie.",
+      "genre": "Mystery",
+      "isFavorite": true
+    },
+    {
+      "id": "6",
+      "title": "Metro 2033",
+      "author": "Dmitry Glukhovsky",
+      "year": 2005,
+      "description": "Walka o przetrwanie w tunelach moskiewskiego metra.",
+      "genre": "Post-apoc",
+      "isFavorite": false
+    },
+    {
+      "id": "7",
+      "title": "Studium w szkarłacie",
+      "author": "A.C. Doyle",
+      "year": 1887,
+      "description": "Pierwsza sprawa Sherlocka Holmesa i Doktora Watsona.",
+      "genre": "Kryminał",
+      "isFavorite": false
+    },
+    {
+      "id": "8",
+      "title": "Fundacja",
+      "author": "Isaac Asimov",
+      "year": 1951,
+      "description": "Plan ratowania cywilizacji galaktycznej przed upadkiem.",
+      "genre": "Sci-Fi",
+      "isFavorite": true
+    },
+    {
+      "id": "9",
+      "title": "Zbrodnia i kara",
+      "author": "Fiodor Dostojewski",
+      "year": 1866,
+      "description": "Dylematy moralne Raskolnikowa po dokonaniu zbrodni.",
+      "genre": "Klasyka",
+      "isFavorite": false
+    },
+    {
+      "id": "10",
+      "title": "Problem trzech ciał",
+      "author": "Cixin Liu",
+      "year": 2008,
+      "description": "Kontakt z obcą cywilizacją zmienia losy ludzkości.",
+      "genre": "Sci-Fi",
+      "isFavorite": true
+    }
   ]
 }
 ```
@@ -74,13 +162,13 @@ Both servers must be running at the same time – Angular fetches books from `ht
 
 ## Available scripts
 
-| Command               | Description                                  |
-|-----------------------|----------------------------------------------|
-| `npm start`           | Start dev server (port 4200)                 |
-| `npm run build`       | Build for production into `dist/`            |
-| `npm run watch`       | Build in watch mode (development)            |
-| `npm run json-server` | Start mock API with `db.json` (port 3001)   |
-| `npm test`            | Run unit tests (Vitest)                     |
+| Command               | Description                               |
+| --------------------- | ----------------------------------------- |
+| `npm start`           | Start dev server (port 4200)              |
+| `npm run build`       | Build for production into `dist/`         |
+| `npm run watch`       | Build in watch mode (development)         |
+| `npm run json-server` | Start mock API with `db.json` (port 3001) |
+| `npm test`            | Run unit tests (Vitest)                   |
 
 ## App structure (overview)
 

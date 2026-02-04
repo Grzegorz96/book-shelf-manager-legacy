@@ -1,28 +1,29 @@
-<form [formGroup]="filterForm" (submit)="applyFilter()" class="filter-bar">
+<form [formGroup]="filterForm" (ngSubmit)="applyFilter()" class="filter-bar">
   <div class="filter-bar__input-wrapper">
     <input
+      autocomplete="off"
       id="filter-book-by-genre"
       type="text"
       placeholder="Filter by genre..."
       class="filter-bar__input"
       formControlName="bookByGenre"
     />
-    @if (filterForm.controls.bookByGenre.value) {
-      <button
-        type="button"
-        class="filter-bar__clear-button"
-        (click)="clearFilter()"
-        aria-label="Clear filter"
-      >
-        <lucide-angular name="X" class="filter-bar__clear-icon" />
-      </button>
+    @if (filterForm.get('bookByGenre')?.value) {
+    <button
+      type="button"
+      class="filter-bar__clear-button"
+      (click)="clearFilter()"
+      aria-label="Clear filter"
+    >
+      <lucide-angular name="X" class="filter-bar__clear-icon" />
+    </button>
     }
   </div>
   <button
     type="submit"
     class="app-button app-button--primary filter-bar__submit-button"
     aria-label="Apply filter"
-    [disabled]="isDisabled()"
+    [disabled]="isDisabled"
   >
     <lucide-angular name="ListFilter" class="filter-bar__submit-icon" />
   </button>
