@@ -1,6 +1,7 @@
 <form [formGroup]="filterForm" (ngSubmit)="applyFilter()" class="filter-bar">
   <div class="filter-bar__input-wrapper">
     <input
+      autocomplete="off"
       id="filter-book-by-genre"
       type="text"
       placeholder="Filter by genre..."
@@ -22,7 +23,7 @@
     type="submit"
     class="app-button app-button--primary filter-bar__submit-button"
     aria-label="Apply filter"
-    [disabled]="isDisabled()"
+    [disabled]="isDisabled"
   >
     <lucide-angular name="ListFilter" class="filter-bar__submit-icon" />
   </button>

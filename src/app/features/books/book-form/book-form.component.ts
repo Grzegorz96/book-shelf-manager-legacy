@@ -1,5 +1,4 @@
-import { Component, input, effect, Resource, resource } from '@angular/core';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Component, Input, DestroyRef, OnInit } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import { Book } from '../book.interface';
 import { Router } from '@angular/router';
@@ -7,11 +6,22 @@ import { BooksService } from '../books.service';
 import { ErrorModalService } from '@shared/error-modal';
 import { BookModalComponent } from '../book-modal';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { KeyValuePipe } from '@angular/common';
+import { KeyValuePipe, AsyncPipe } from '@angular/common';
 import { ValidationErrorPipe } from '@core/pipes';
+import { BehaviorSubject, EMPTY, filter, tap, switchMap, catchError, finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpErrorResponse } from '@angular/common/http';
 
 type BookFormModel = Omit<Book, 'id'>;
 
+interface BookState {
+  data: Book | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  error: string | null;
+}
+
+// Book form component in imperative style of data flow
 @Component({
   selector: 'app-book-form',
   imports: [
@@ -20,13 +30,24 @@ type BookFormModel = Omit<Book, 'id'>;
     ReactiveFormsModule,
     KeyValuePipe,
     ValidationErrorPipe,
+    AsyncPipe,
   ],
   templateUrl: './book-form.component.html',
   styleUrl: './book-form.component.scss',
 })
-export class BookFormComponent {
-  readonly id = input<string>();
-  protected readonly bookResource: Resource<Book | undefined>;
+export class BookFormComponent implements OnInit {
+  protected readonly id$ = new BehaviorSubject<string | null>(null);
+
+  protected readonly state$ = new BehaviorSubject<BookState>({
+    data: null,
+    isLoading: false,
+    isSaving: false,
+    error: null,
+  });
+
+  @Input() set id(value: string) {
+    this.id$.next(value);
+  }
 
   protected readonly bookForm = new FormGroup({
     title: new FormControl('', {
@@ -58,69 +79,82 @@ export class BookFormComponent {
   constructor(
     private readonly router: Router,
     private readonly booksService: BooksService,
-    private readonly errorModalService: ErrorModalService
-  ) {
-    this.bookResource = resource({
-      params: () => ({ id: this.id() }),
-      loader: async ({ params }) => {
-        if (!params.id) return;
-        return await this.booksService.getBook(params.id);
-      },
-    });
+    private readonly errorModalService: ErrorModalService,
+    private readonly destroyRef: DestroyRef
+  ) {}
 
-    effect(() => {
-      if (this.bookResource.error()) {
-        return;
-      }
-      const bookFromApi = this.bookResource.value();
-      if (bookFromApi) {
-        this.bookForm.patchValue({
-          title: bookFromApi.title,
-          author: bookFromApi.author,
-          year: bookFromApi.year,
-          description: bookFromApi.description,
-          genre: bookFromApi.genre,
-          isFavorite: bookFromApi.isFavorite,
-        });
-      }
-    });
+  ngOnInit(): void {
+    this.id$
+      .pipe(
+        tap((id) => {
+          const isEdit = !!id;
 
-    effect(() => {
-      const err = this.bookResource.error();
-      if (!err) return;
-      const isNotFound = err instanceof HttpErrorResponse && err.status === 404;
-      const title = isNotFound ? 'Book not found' : 'Error getting book';
-      const message = isNotFound
-        ? 'The book you are trying to edit does not exist or has been removed.'
-        : 'An error occurred while getting the book. Please try again later.';
-      this.errorModalService.openErrorModal({
-        title,
-        message,
-        dismissLabel: 'Back to Library',
-        onDismiss: () => this.handleCancel(),
+          this.state$.next({
+            ...this.state$.value,
+            data: null,
+            isLoading: isEdit,
+            error: null,
+          });
+
+          if (!isEdit) this.bookForm.reset();
+        }),
+        filter((id): id is string => !!id),
+        switchMap((id) =>
+          this.booksService.getBook(id).pipe(
+            catchError((err) => {
+              const isNotFound = err instanceof HttpErrorResponse && err.status === 404;
+              const title = isNotFound ? 'Book not found' : 'Error getting book';
+              const message = isNotFound
+                ? 'The book you are trying to edit does not exist or has been removed.'
+                : 'An error occurred while getting the book. Please try again later.';
+
+              this.state$.next({ ...this.state$.value, isLoading: false, error: message });
+
+              this.errorModalService.openErrorModal({
+                title,
+                message,
+                dismissLabel: 'Back to Library',
+                onDismiss: () => this.handleCancel(),
+              });
+              return EMPTY;
+            })
+          )
+        ),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe((book) => {
+        this.state$.next({ ...this.state$.value, data: book, isLoading: false });
+        this.bookForm.patchValue(book);
       });
-    });
   }
 
-  private async saveProcess(formValue: BookFormModel): Promise<void> {
-    const id = this.id();
-    try {
-      if (id) {
-        const updatedBook = await this.booksService.updateBook(id, formValue);
-        this.booksService.updateCacheAfterEdit(updatedBook);
-      } else {
-        const createdBook = await this.booksService.createBook(formValue);
-        this.booksService.updateCacheAfterAdd(createdBook);
-      }
-      this.router.navigate(['/books']);
-    } catch {
-      this.errorModalService.openErrorModal({
-        title: `Error ${id ? 'updating' : 'creating'} book`,
-        message: `An error occurred while ${id ? 'updating' : 'creating'} the book.`,
-        actionLabel: 'Retry',
-        onAction: () => this.saveProcess(formValue),
+  private saveProcess(formValue: BookFormModel): void {
+    const id = this.id$.value;
+
+    this.state$.next({ ...this.state$.value, isSaving: true });
+
+    const request$ = id
+      ? this.booksService.updateBook(id, formValue)
+      : this.booksService.createBook(formValue);
+
+    request$
+      .pipe(
+        finalize(() => this.state$.next({ ...this.state$.value, isSaving: false })),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: () => {
+          this.router.navigate(['/books']);
+        },
+        error: () => {
+          this.errorModalService.openErrorModal({
+            title: `Error ${id ? 'updating' : 'creating'} book`,
+            message: `An error occurred while ${id ? 'updating' : 'creating'} the book.`,
+            actionLabel: 'Retry',
+            onAction: () => this.saveProcess(formValue),
+          });
+        },
       });
-    }
   }
 
   handleSubmit(): void {

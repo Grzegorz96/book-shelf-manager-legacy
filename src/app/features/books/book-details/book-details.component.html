@@ -1,51 +1,51 @@
-@if (bookResource.isLoading()) {
-  <app-book-modal [loader]="true" loaderText="Loading book..." />
-} @if (bookResource.hasValue()) {
-  <app-book-modal (close)="handleClose()">
-    <div class="book-details">
-      <h3 class="book-details__title">Book Details</h3>
-      <div class="book-details__content">
-        <div class="book-details__field">
-          <span class="book-details__label">Title:</span>
-          <span class="book-details__value">{{ bookResource.value().title }}</span>
+@if (state$ | async; as state) { @if (state.isLoading) {
+<app-book-modal [loader]="true" loaderText="Loading book..." />
+} @if (state.data) {
+<app-book-modal (close)="handleClose()">
+  <div class="book-details">
+    <h3 class="book-details__title">Book Details</h3>
+    <div class="book-details__content">
+      <div class="book-details__field">
+        <span class="book-details__label">Title:</span>
+        <span class="book-details__value">{{ state.data.title }}</span>
+      </div>
+      <div class="book-details__field">
+        <span class="book-details__label">Author:</span>
+        <span class="book-details__value">{{ state.data.author }}</span>
+      </div>
+      <div class="book-details__field">
+        <span class="book-details__label">Year:</span>
+        <span class="book-details__value">{{ state.data.year }}</span>
+      </div>
+      <div class="book-details__field">
+        <span class="book-details__label">Genre:</span>
+        <span class="book-details__value">{{ state.data.genre }}</span>
+      </div>
+      <div class="book-details__field">
+        <span class="book-details__label">Favorite:</span>
+        @if (state.data.isFavorite) {
+        <div class="book-details__value-container">
+          <lucide-angular name="Star" class="book-details__value-icon" />
+          <span class="book-details__value">Yes</span>
         </div>
-        <div class="book-details__field">
-          <span class="book-details__label">Author:</span>
-          <span class="book-details__value">{{ bookResource.value().author }}</span>
-        </div>
-        <div class="book-details__field">
-          <span class="book-details__label">Year:</span>
-          <span class="book-details__value">{{ bookResource.value().year }}</span>
-        </div>
-        <div class="book-details__field">
-          <span class="book-details__label">Genre:</span>
-          <span class="book-details__value">{{ bookResource.value().genre }}</span>
-        </div>
-        <div class="book-details__field">
-          <span class="book-details__label">Favorite:</span>
-          @if (bookResource.value().isFavorite) {
-          <div class="book-details__value-container">
-            <lucide-angular name="Star" class="book-details__value-icon" />
-            <span class="book-details__value">Yes</span>
+        } @else {
+        <span class="book-details__value">No</span>
+        }
+      </div>
+      <div class="book-details__field book-details__field--full">
+        <div class="book-details__description-container">
+          <span class="book-details__label">Description:</span>
+          <div class="book-details__reading-time">
+            <lucide-angular name="Clock" class="book-details__reading-time-icon" />
+            <span class="book-details__reading-time-value">{{
+              state.data.description | readingTime
+            }}</span>
           </div>
-          } @else {
-          <span class="book-details__value">No</span>
-          }
         </div>
-        <div class="book-details__field book-details__field--full">
-          <div class="book-details__description-container">
-            <span class="book-details__label">Description:</span>
-            <div class="book-details__reading-time">
-              <lucide-angular name="Clock" class="book-details__reading-time-icon" />
-              <span class="book-details__reading-time-value">{{
-                bookResource.value().description | readingTime
-              }}</span>
-            </div>
-          </div>
 
-          <p class="book-details__description">{{ bookResource.value().description }}</p>
-        </div>
+        <p class="book-details__description">{{ state.data.description }}</p>
       </div>
     </div>
-  </app-book-modal>
-}
+  </div>
+</app-book-modal>
+} }

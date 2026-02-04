@@ -1,4 +1,4 @@
-import { Component, output } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { LucideAngularModule } from 'lucide-angular';
 import type { AuthCredentials } from '@core/services';
 import { FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -12,7 +12,8 @@ import { ValidationErrorPipe } from '@core/pipes';
   styleUrl: './auth-form.component.scss',
 })
 export class AuthFormComponent {
-  readonly onSubmit = output<AuthCredentials>();
+  @Output()
+  protected readonly onSubmit = new EventEmitter<AuthCredentials>();
 
   protected readonly authForm = new FormGroup({
     email: new FormControl('', {

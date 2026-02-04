@@ -4,7 +4,7 @@ priority: high
 scope: project
 ---
 
-You are an expert in TypeScript, Angular, and scalable web application development. You write functional, maintainable, performant, and accessible code following Angular and TypeScript best practices.
+You are an expert in TypeScript, Angular, and scalable web application development. This project uses **legacy-style Angular patterns** for learning: decorators, constructor injection, and RxJS instead of signals. You write functional, maintainable, performant, and accessible code following these conventions and TypeScript best practices.
 
 ## TypeScript Best Practices
 
@@ -12,11 +12,11 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 - Prefer type inference when the type is obvious
 - Avoid the `any` type; use `unknown` when type is uncertain
 
-## Angular Best Practices
+## Angular Best Practices (Legacy Style)
 
 - Always use standalone components over NgModules
 - Must NOT set `standalone: true` inside Angular decorators. It's the default in Angular v20+.
-- Use signals for state management
+- Use **RxJS** (Observables, Subjects, BehaviorSubject) for state management instead of signals
 - Implement lazy loading for feature routes
 - Do NOT use the `@HostBinding` and `@HostListener` decorators. Put host bindings inside the `host` object of the `@Component` or `@Directive` decorator instead
 - Use `NgOptimizedImage` for all static images.
@@ -30,8 +30,8 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 ### Components
 
 - Keep components small and focused on a single responsibility
-- Use `input()` and `output()` functions instead of decorators
-- Use `computed()` for derived state
+- Use **decorators** `@Input()` and `@Output()` for component API (not `input()` / `output()` functions)
+- Use **RxJS** (Observables, Subjects, BehaviorSubject) for local and derived state instead of signals and `computed()`
 - Set `changeDetection: ChangeDetectionStrategy.OnPush` in `@Component` decorator
 - Prefer inline templates for small components
 - Prefer Reactive forms instead of Template-driven ones
@@ -41,16 +41,16 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 ## State Management
 
-- Use signals for local component state
-- Use `computed()` for derived state
+- Use **RxJS** (Observables, Subjects, BehaviorSubject) for local component state instead of signals
+- Use Observable streams and operators (e.g. `map`, `combineLatest`) for derived state instead of `computed()`
 - Keep state transformations pure and predictable
-- Do NOT use `mutate` on signals, use `update` or `set` instead
+- Expose state as Observables and subscribe in templates via async pipe or in components via `subscribe()`
 
 ## Templates
 
 - Keep templates simple and avoid complex logic
-- Use native control flow (`@if`, `@for`, `@switch`) instead of `*ngIf`, `*ngFor`, `*ngSwitch`
-- Use the async pipe to handle observables
+- Use **structural directives** `*ngIf`, `*ngFor`, `*ngSwitch` (legacy style) instead of native control flow `@if`, `@for`, `@switch`
+- Use the async pipe to handle Observables
 - Do not assume globals like (`new Date()`) are available.
 - Do not write arrow functions in templates (they are not supported).
 
@@ -58,4 +58,4 @@ You are an expert in TypeScript, Angular, and scalable web application developme
 
 - Design services around a single responsibility
 - Use the `providedIn: 'root'` option for singleton services
-- Use constructor injection instead of `inject()` function
+- Use **constructor injection** for dependencies (do NOT use the `inject()` function)

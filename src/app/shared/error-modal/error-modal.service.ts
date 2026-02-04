@@ -1,11 +1,9 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ErrorModalState } from './error-modal.interface';
-
-/** Callback for primary action; may be sync or async. */
-type actionCallback = () => Promise<void> | void;
+import { BehaviorSubject } from 'rxjs';
 
 export interface OpenErrorModalParams extends ErrorModalState {
-  onAction?: actionCallback;
+  onAction?: () => void;
   /** Called when modal is closed by dismiss (Cancel, X, overlay). Not called when primary action is used. */
   onDismiss?: () => void;
 }
@@ -18,11 +16,11 @@ export interface OpenErrorModalParams extends ErrorModalState {
   providedIn: 'root',
 })
 export class ErrorModalService {
-  private readonly _modalSignal = signal<ErrorModalState | null>(null);
-  private onAction: actionCallback | null = null;
-  private onDismiss: (() => void) | null = null;
+  private readonly _state$ = new BehaviorSubject<ErrorModalState | null>(null);
+  public readonly state$ = this._state$.asObservable();
 
-  readonly state = this._modalSignal.asReadonly();
+  private onAction: (() => void) | null = null;
+  private onDismiss: (() => void) | null = null;
 
   openErrorModal(params: OpenErrorModalParams): void {
     this.onAction = params.onAction ?? null;
@@ -33,7 +31,8 @@ export class ErrorModalService {
       actionLabel: params.actionLabel,
       dismissLabel: params.dismissLabel,
     };
-    this._modalSignal.set(nextState);
+
+    this._state$.next(nextState);
   }
 
   /**
@@ -43,18 +42,20 @@ export class ErrorModalService {
   closeErrorModal(): void {
     this.onDismiss?.();
 
-    this.onAction = null;
-    this.onDismiss = null;
-    this._modalSignal.set(null);
+    this.resetState();
   }
 
   executeAction(): void {
-    const action: actionCallback | null = this.onAction;
+    const action: (() => void) | null = this.onAction;
 
-    this.onAction = null;
-    this.onDismiss = null;
-    this._modalSignal.set(null);
+    this.resetState();
 
     action?.();
+  }
+
+  private resetState(): void {
+    this.onAction = null;
+    this.onDismiss = null;
+    this._state$.next(null);
   }
 }

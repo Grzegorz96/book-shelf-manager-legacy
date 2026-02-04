@@ -1,15 +1,16 @@
-import { Injectable, signal, effect, RendererFactory2, Renderer2 } from '@angular/core';
+import { Injectable, RendererFactory2, Renderer2 } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ScrollService {
   private readonly renderer: Renderer2;
-  private readonly blockedCount = signal(0);
+  private readonly _blockedCount$ = new BehaviorSubject<number>(0);
 
   constructor(rendererFactory: RendererFactory2) {
     this.renderer = rendererFactory.createRenderer(null, null);
 
-    effect(() => {
-      if (this.blockedCount() > 0) {
+    this._blockedCount$.subscribe((count) => {
+      if (count > 0) {
         this.renderer.setStyle(document.documentElement, 'overflow', 'hidden');
       } else {
         this.renderer.removeStyle(document.documentElement, 'overflow');
@@ -18,10 +19,10 @@ export class ScrollService {
   }
 
   lock() {
-    this.blockedCount.update((count) => count + 1);
+    this._blockedCount$.next(this._blockedCount$.value + 1);
   }
 
   unlock() {
-    this.blockedCount.update((count) => Math.max(0, count - 1));
+    this._blockedCount$.next(Math.max(0, this._blockedCount$.value - 1));
   }
 }

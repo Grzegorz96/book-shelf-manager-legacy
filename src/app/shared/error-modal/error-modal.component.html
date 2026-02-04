@@ -1,10 +1,10 @@
-@if (modalState(); as m) {
+@if (modalState$ | async; as modalState) {
 <div class="error-modal" appScrollLock appBackdropClick (backdropClick)="handleDismiss()">
   <div
     class="error-modal__dialog"
     role="dialog"
     aria-modal="true"
-    [attr.aria-label]="m.title"
+    [attr.aria-label]="modalState.title"
     (click)="$event.stopPropagation()"
   >
     <button
@@ -16,18 +16,18 @@
       <lucide-angular name="X" class="error-modal__close-button-icon" />
     </button>
 
-    <h2 class="error-modal__title">{{ m.title }}</h2>
-    <p class="error-modal__message">{{ m.message }}</p>
+    <h2 class="error-modal__title">{{ modalState.title }}</h2>
+    <p class="error-modal__message">{{ modalState.message }}</p>
 
     <div class="error-modal__actions">
-      @if (m.actionLabel) {
+      @if (modalState.actionLabel) {
       <button class="app-button app-button--primary" type="button" (click)="handleAction()">
-        {{ m.actionLabel }}
+        {{ modalState.actionLabel }}
       </button>
       }
 
       <button class="app-button app-button--secondary" type="button" (click)="handleDismiss()">
-        {{ m.dismissLabel ?? 'Dismiss' }}
+        {{ modalState.dismissLabel ?? 'Dismiss' }}
       </button>
     </div>
   </div>
